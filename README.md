@@ -15,4 +15,4 @@
 - MAFFT (Multiple sequence alignment)
 - RAxML (Phylogenetic tree)
 
-# We need Jorge's dataset for the Antibiotic resistant genes
+# We need Jorge's dataset for the Antibiotic resistant genes (Will obtain SRR numbers then)
