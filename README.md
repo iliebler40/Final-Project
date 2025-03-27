@@ -16,3 +16,6 @@
 - RAxML (Phylogenetic tree)
 
 # We need Jorge's dataset for the Antibiotic resistant genes (Will obtain SRR numbers then)
+
+**Need to install**
+- CARD
