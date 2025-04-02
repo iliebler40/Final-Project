@@ -19,3 +19,4 @@
 
 **Need to install**
 - CARD
+- ResFinder
