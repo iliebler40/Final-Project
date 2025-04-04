@@ -22,9 +22,9 @@
 - ResFinder
   
 3. Download FASTQ files of paired-end reads.
-
+```
  nano download_sra_job.sh
- 
+```
 ```
 #!/bin/bash
 #SBATCH --job-name=download_sra
