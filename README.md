@@ -28,17 +28,28 @@
 vi download_sra.sh
 ```
    - Type `I` and enter the following workflow:
-```bash
-#!/bin/bash
-# Download all SRR files from PRJNA759579
-# esearch -db sra -query PRJNA759579 | efetch -format runinfo > runinfo.csv
-# cut -d ',' -f 1 runinfo.csv | grep SRR > srr_accessions.txt
+```#!/bin/bash
+#SBATCH --job-name=download_sra
+#SBATCH --output=download_sra_%j.out
+#SBATCH --error=download_sra_%j.err
+#SBATCH --time=12:00:00           # Adjust as needed
+#SBATCH --partition=standard      # Adjust based on your HPC configuration
+#SBATCH --ntasks=102
+#SBATCH --cpus-per-task=4         # Optional: fastq-dump can benefit from multithreading
+#SBATCH --mem=100G                 # Adjust memory as needed
+#SBATCH --mail-type=END,FAIL      # Optional: email on job end/failure
+#SBATCH --mail-user= irliebler@svsu.edu
 
-# Use prefetch to download all files
+# Load necessary modules
 module load sra-toolkit
+
+# Ensure the output directory exists
+mkdir -p fastq_files
+
+# Download each SRR
 while read -r SRR; do
-   echo "Downloading $SRR..."
-   prefetch --max-size 100G $SRR 
-   fastq-dump --gzip $SRR --split-files -O fastq_files/
+    echo "Downloading $SRR..."
+    prefetch --max-size 100G "$SRR"
+    fastq-dump --gzip "$SRR" --split-files -O fastq_files/
 done < srr_accessions.txt
 ```
