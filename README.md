@@ -20,3 +20,25 @@
 **Need to install**
 - CARD
 - ResFinder
+  
+3. Download FASTQ files of paired-end reads.
+    -  Create a file named `download_sra.sh` with the following content:
+    -  Type
+```
+vi download_sra.sh
+```
+   - Type `I` and enter the following workflow:
+```bash
+#!/bin/bash
+# Download all SRR files from PRJNA759579
+# esearch -db sra -query PRJNA759579 | efetch -format runinfo > runinfo.csv
+# cut -d ',' -f 1 runinfo.csv | grep SRR > srr_accessions.txt
+
+# Use prefetch to download all files
+module load sra-toolkit
+while read -r SRR; do
+   echo "Downloading $SRR..."
+   prefetch --max-size 100G $SRR 
+   fastq-dump --gzip $SRR --split-files -O fastq_files/
+done < srr_accessions.txt
+```
