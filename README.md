@@ -22,34 +22,42 @@
 - ResFinder
   
 3. Download FASTQ files of paired-end reads.
-    -  Create a file named `download_sra.sh` with the following content:
-    -  Type
+
+ nano download_sra_job.sh
+ 
 ```
-vi download_sra.sh
-```
-   - Type `I` and enter the following workflow:
-```#!/bin/bash
+#!/bin/bash
 #SBATCH --job-name=download_sra
-#SBATCH --output=download_sra_%j.out
-#SBATCH --error=download_sra_%j.err
-#SBATCH --time=12:00:00           # Adjust as needed
-#SBATCH --partition=standard      # Adjust based on your HPC configuration
-#SBATCH --ntasks=102
-#SBATCH --cpus-per-task=4         # Optional: fastq-dump can benefit from multithreading
-#SBATCH --mem=100G                 # Adjust memory as needed
-#SBATCH --mail-type=END,FAIL      # Optional: email on job end/failure
-#SBATCH --mail-user= irliebler@svsu.edu
+#SBATCH --output=logs/download_%j.out
+#SBATCH --error=logs/download_%j.err
+#SBATCH --time=12:00:00
+#SBATCH --mem=100G
+#SBATCH --cpus-per-task=4
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=jrander3@svsu.edu
 
-# Load necessary modules
-module load sra-toolkit
-
-# Ensure the output directory exists
+# Ensure log and output directories exist
+mkdir -p logs
 mkdir -p fastq_files
 
-# Download each SRR
+# Load the SRA Toolkit module
+module load sra-toolkit
+
+# Read SRR accession numbers and download each
 while read -r SRR; do
-    echo "Downloading $SRR..."
-    prefetch --max-size 100G "$SRR"
-    fastq-dump --gzip "$SRR" --split-files -O fastq_files/
+   if [[ -n "$SRR" ]]; then
+      echo "Downloading $SRR..."
+      prefetch --max-size 100G "$SRR"
+
+      if [[ $? -eq 0 ]]; then
+         echo "Converting $SRR to FASTQ..."
+         fastq-dump --gzip --split-files -O fastq_files/ "$SRR"
+      else
+         echo "Failed to download $SRR" >&2
+      fi
+   fi
 done < srr_accessions.txt
+```
+```
+sbatch download_sra_job.sh
 ```
